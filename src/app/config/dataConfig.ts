@@ -8,13 +8,13 @@ export const APP_CONFIG = {
     pending: "#f59e0b",
   },
 };
-
+ 
 export const SUMMARY_DATA = [
   { id: 1, label: "Total Group Pool", value: "P 45,000", icon: "wallet" },
   { id: 2, label: "My Balance", value: "P 8,500", icon: "coins" },
   { id: 3, label: "Active Loans", value: "3", icon: "handshake" },
 ];
-
+ 
 export const MEMBER_DATA = [
   { id: 1, name: "Hope Kenosi", monthlyPaid: true, progressPercent: 85, signatoryStatus: "approved" },
   { id: 2, name: "Eugune Member", monthlyPaid: true, progressPercent: 92, signatoryStatus: "approved" },
@@ -23,13 +23,14 @@ export const MEMBER_DATA = [
   { id: 5, name: "Joseph Kgosing", monthlyPaid: true, progressPercent: 68, signatoryStatus: "approved" },
   { id: 6, name: "Boipelo Sekao", monthlyPaid: false, progressPercent: 30, signatoryStatus: "pending" },
 ];
-
+ 
 export const ACTION_BUTTONS = [
-  { id: 1, label: "Record Contribution", icon: "plus", feature: "Record Contribution" },
-  { id: 2, label: "Request Loan", icon: "handCoins", feature: "Request Loan" },
-  { id: 3, label: "Approve (Signatory)", icon: "checkCircle", feature: "Approve Signatory" },
+  { id: 1, label: "Record Contribution", icon: "plus", feature: "Record Contribution", route: undefined },
+  { id: 2, label: "Request Loan", icon: "handCoins", feature: "Request Loan", route: "/loan-request" },
+  { id: 3, label: "Approve (Signatory)", icon: "checkCircle", feature: "Approve Signatory", route: undefined },
+  { id: 4, label: "Enroll Member", icon: "users", feature: "Enroll Member", route: "/enroll" },
 ];
-
+ 
 export const TABLE_COLUMNS = {
   name: "Name",
   monthlyPaid: "P1,000 Monthly",
