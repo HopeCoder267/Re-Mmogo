@@ -20,4 +20,5 @@ export {
   MAX_LOAN_AMOUNT,
   MIN_LOAN_AMOUNT,
   YEAR_END_REPORT,
+  MOCK_GROUPS,
 } from '../../data/mockData';

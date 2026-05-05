@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import { Users, ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ROLE_OPTIONS, CONTRIBUTION_DAY_OPTIONS } from "../config/dataConfig";
+import { GroupSelector } from "./GroupSelector";
+import { useCurrentGroup } from "../../hooks/useCurrentGroup";
 
 interface EnrollFormData {
   fullName: string;
@@ -23,6 +25,7 @@ interface EnrollFormData {
 export default function MemberEnrollmentPage() {
   const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
+  const { currentGroup, userGroups, switchGroup } = useCurrentGroup();
 
   const {
     register,
@@ -81,10 +84,27 @@ export default function MemberEnrollmentPage() {
       {/* SECTION: NAVBAR */}
       <nav className="bg-[#1e1b4b] text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-wide">RE-MMOGO</h1>
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl font-bold text-[#1e1b4b] mb-2">
+              Enroll New Member
+            </h2>
+            {userGroups.length > 1 && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Enrolling into:</span>
+                <GroupSelector
+                  groups={userGroups}
+                  currentGroup={currentGroup}
+                  onGroupChange={switchGroup}
+                  className="w-48"
+                />
+              </div>
+            )}
+          </div>
           <button
             onClick={() => navigate("/")}
             className="flex items-center gap-2 text-sm hover:bg-white/10 px-3 py-2 rounded-lg transition-colors"
+            aria-label="Back to dashboard"
+            role="button"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </button>

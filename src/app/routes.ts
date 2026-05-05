@@ -1,18 +1,24 @@
 import { createBrowserRouter } from "react-router";
 import Dashboard from "./components/Dashboard";
+import LoginPage from "./components/LoginPage";
 import RegisterPage from "./components/RegisterPage";
 import LoanRequestPage from "./components/LoanRequestPage";
 import MemberEnrollmentPage from "./components/MemberEnrollmentPage";
 import GroupRegistrationPage from "./components/GroupRegistrationPage";
-import SignatoryApprovalPage from "./components/SignatoryApprovalPage";
 import ContributionRecordingPage from "./components/ContributionRecordingPage";
 import LoanRepaymentPage from "./components/LoanRepaymentPage";
+import SignatoryApprovalPage from "./components/SignatoryApprovalPage";
 import YearEndReportPage from "./components/YearEndReportPage";
- 
+import GroupDetailsPage from "./components/GroupDetailsPage";
+
 export const router = createBrowserRouter([
   {
     path: "/",
     Component: Dashboard,
+  },
+  {
+    path: "/login",
+    Component: LoginPage,
   },
   {
     path: "/register",
@@ -45,5 +51,9 @@ export const router = createBrowserRouter([
   {
     path: "/year-end-report",
     Component: YearEndReportPage,
+  },
+  {
+    path: "/group/:groupId",
+    Component: GroupDetailsPage,
   },
 ]);
