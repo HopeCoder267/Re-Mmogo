@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff, UserPlus, ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useDebounce } from "../../hooks/useDebounce";
 
 interface RegisterFormData {
   fullName: string;
@@ -68,10 +69,15 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     watch,
+    trigger,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterFormData>();
+  } = useForm<RegisterFormData>({
+    mode: 'onBlur',
+  });
 
   const password = watch("password", "");
+  const debouncedEmail = useDebounce(watch("email", ""), 500);
+  const debouncedPhone = useDebounce(watch("phone", ""), 500);
 
   const onSubmit = async (data: RegisterFormData) => {
     // FEATURE PENDING: Replace with real API call
@@ -85,15 +91,15 @@ export default function RegisterPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         {/* SECTION: NAVBAR */}
-        <nav className="bg-[#1e1b4b] text-white shadow-lg">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
-            <h1 className="text-2xl font-bold tracking-wide">RE-MMOGO</h1>
+        <nav className="bg-[#1e1b4b] text-white shadow-lg" role="navigation" aria-label="Main navigation">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-wide">RE-MMOGO</h1>
           </div>
         </nav>
 
         {/* SECTION: SUCCESS STATE */}
-        <div className="flex-1 flex items-center justify-center px-4">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-10 max-w-md w-full text-center">
+        <div className="flex-1 flex items-center justify-center px-3 sm:px-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-10 max-w-md w-full text-center" role="alert" aria-live="polite">
             <CheckCircle className="w-16 h-16 text-[#10b981] mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-[#1e1b4b] mb-2">
               Registration Successful!
@@ -105,6 +111,8 @@ export default function RegisterPage() {
             <button
               onClick={() => navigate("/")}
               className="w-full bg-[#1e1b4b] hover:bg-[#2d2755] text-white py-3 rounded-lg font-semibold transition-colors"
+              aria-label="Return to dashboard"
+              role="button"
             >
               Back to Dashboard
             </button>
@@ -117,21 +125,23 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* SECTION: NAVBAR */}
-      <nav className="bg-[#1e1b4b] text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-wide">RE-MMOGO</h1>
+      <nav className="bg-[#1e1b4b] text-white shadow-lg" role="navigation" aria-label="Main navigation">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center justify-between">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-wide">RE-MMOGO</h1>
           <button
             onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-sm hover:bg-white/10 px-3 py-2 rounded-lg transition-colors"
+            className="flex items-center gap-2 text-xs sm:text-sm hover:bg-white/10 px-2 sm:px-3 py-2 rounded-lg transition-colors"
+            aria-label="Return to dashboard"
+            role="button"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+            <ArrowLeft className="w-4 h-4" /> <span className="hidden sm:inline">Back to Dashboard</span>
           </button>
         </div>
       </nav>
 
       {/* SECTION: FORM */}
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+      <main className="max-w-2xl mx-auto px-3 sm:px-6 lg:px-8 xl:px-10 py-8 sm:py-10" role="main">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
           {/* SECTION: HEADER */}
           <div className="flex items-center gap-3 mb-6">
             <div className="bg-[#1e1b4b] p-2 rounded-lg">
@@ -151,29 +161,40 @@ export default function RegisterPage() {
             {/* SECTION: NAME + EMAIL */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label 
+                  htmlFor="fullName" 
+                  className="block text-sm font-semibold text-gray-700 mb-1"
+                >
                   Full Name
                 </label>
                 <input
+                  id="fullName"
                   {...register("fullName", {
                     required: "Full name is required",
+                    onBlur: () => trigger("fullName"),
                   })}
                   placeholder="e.g. Hope Kenosi"
-                  className={`w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e1b4b] transition ${
+                  aria-label="Enter your full name"
+                  aria-invalid={!!errors.fullName}
+                  aria-describedby={errors.fullName ? "fullName-error" : undefined}
+                  className={`w-full border rounded-lg px-3 sm:px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e1b4b] transition ${
                     errors.fullName
                       ? "border-red-400 bg-red-50"
                       : "border-gray-200"
                   }`}
                 />
                 {errors.fullName && (
-                  <p className="text-red-500 text-xs mt-1">
+                  <p id="fullName-error" className="text-red-500 text-xs mt-1" role="alert">
                     {errors.fullName.message}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label 
+                  htmlFor="email" 
+                  className="block text-sm font-semibold text-gray-700 mb-1"
+                >
                   Email Address
                 </label>
                 <input

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { Users, ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { ROLE_OPTIONS, CONTRIBUTION_DAY_OPTIONS } from "../config/dataConfig";
 
 interface EnrollFormData {
   fullName: string;
@@ -18,8 +19,6 @@ interface EnrollFormData {
   declaration: boolean;
 }
 
-const ROLE_OPTIONS = ["Member", "Signatory", "Treasurer"];
-const CONTRIBUTION_DAYS = ["1st", "5th", "10th", "15th", "20th", "25th", "Last day"];
 
 export default function MemberEnrollmentPage() {
   const navigate = useNavigate();
@@ -231,7 +230,7 @@ export default function MemberEnrollmentPage() {
                     }`}
                   >
                     <option value="">Select role...</option>
-                    {ROLE_OPTIONS.map((r) => (
+                    {ROLE_OPTIONS.map((r: string) => (
                       <option key={r}>{r}</option>
                     ))}
                   </select>
@@ -251,7 +250,7 @@ export default function MemberEnrollmentPage() {
                     }`}
                   >
                     <option value="">Select day...</option>
-                    {CONTRIBUTION_DAYS.map((d) => (
+                    {CONTRIBUTION_DAY_OPTIONS.map((d: string) => (
                       <option key={d}>{d}</option>
                     ))}
                   </select>

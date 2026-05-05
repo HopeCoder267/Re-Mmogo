@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { HandCoins, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { MEMBER_DATA, SUMMARY_DATA } from "../config/dataConfig";
+import { MEMBER_DATA, SUMMARY_DATA, GROUP_CONFIG, LOAN_PURPOSE_OPTIONS, REPAYMENT_PERIOD_OPTIONS, MAX_LOAN_AMOUNT, MIN_LOAN_AMOUNT } from "../config/dataConfig";
 
 interface LoanFormData {
   memberId: string;
@@ -13,28 +13,9 @@ interface LoanFormData {
   notes: string;
 }
 
-const PURPOSE_OPTIONS = [
-  "Medical Emergency",
-  "School Fees",
-  "Business Investment",
-  "Home Repair",
-  "Funeral / Burial",
-  "Other",
-];
 
-const REPAYMENT_OPTIONS = [
-  { label: "1 month", value: "1" },
-  { label: "2 months", value: "2" },
-  { label: "3 months", value: "3" },
-  { label: "6 months", value: "6" },
-];
-
-// Extract pool total from config (strips "P " prefix and commas)
-const POOL_VALUE_STR = SUMMARY_DATA.find((s) => s.label === "Total Group Pool")?.value ?? "P 45,000";
-const POOL_TOTAL = parseInt(POOL_VALUE_STR.replace(/[^0-9]/g, ""), 10);
-const MAX_LOAN = POOL_TOTAL * 0.5;
-const MIN_LOAN = 500;
-const INTEREST_RATE = 0.05;
+// Use centralized configuration values
+const INTEREST_RATE = GROUP_CONFIG.interestRate; // 20% monthly interest rate
 
 function RepaymentBreakdown({
   amount,
@@ -87,7 +68,7 @@ export default function LoanRequestPage() {
   const monthsRaw = watch("repaymentMonths", "");
   const amountNum = parseFloat(amountRaw);
   const monthsNum = parseInt(monthsRaw, 10);
-  const showBreakdown = !isNaN(amountNum) && amountNum >= MIN_LOAN && !isNaN(monthsNum) && monthsNum > 0;
+  const showBreakdown = !isNaN(amountNum) && amountNum >= MIN_LOAN_AMOUNT && !isNaN(monthsNum) && monthsNum > 0;
 
   const onSubmit = async (data: LoanFormData) => {
     // FEATURE PENDING: Replace with real API call
@@ -99,7 +80,7 @@ export default function LoanRequestPage() {
   };
 
   const getMemberName = (id: string) =>
-    MEMBER_DATA.find((m) => m.id === parseInt(id))?.name ?? "";
+    MEMBER_DATA.find((m) => m.id === parseInt(id))?.fullName ?? "";
 
   if (submitted && submittedData) {
     const amt = parseFloat(submittedData.amount);
@@ -174,11 +155,11 @@ export default function LoanRequestPage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 flex justify-between text-white">
           <div>
             <p className="text-xs text-[#10b981] font-semibold uppercase tracking-wider">Total Group Pool</p>
-            <p className="text-xl font-bold">P {POOL_TOTAL.toLocaleString()}</p>
+            <p className="text-xl font-bold">P {MAX_LOAN_AMOUNT * 2}</p>
           </div>
           <div className="text-right">
             <p className="text-xs text-[#10b981] font-semibold uppercase tracking-wider">Max Loan (50%)</p>
-            <p className="text-xl font-bold">P {MAX_LOAN.toLocaleString()}</p>
+            <p className="text-xl font-bold">P {MAX_LOAN_AMOUNT.toLocaleString()}</p>
           </div>
         </div>
       </div>
@@ -210,7 +191,7 @@ export default function LoanRequestPage() {
                 <option value="">Select your name...</option>
                 {MEMBER_DATA.map((m) => (
                   <option key={m.id} value={m.id}>
-                    {m.name}
+                    {m.fullName}
                   </option>
                 ))}
               </select>
@@ -231,9 +212,9 @@ export default function LoanRequestPage() {
                     const n = parseFloat(val);
                     if (isNaN(n) || !/^\d+(\.\d+)?$/.test(val.trim()))
                       return "Amount must be a valid number (digits only)";
-                    if (n < MIN_LOAN) return `Minimum loan amount is P${MIN_LOAN}`;
-                    if (n > MAX_LOAN)
-                      return `Maximum loan is P${MAX_LOAN.toLocaleString()} (50% of pool)`;
+                    if (n < MIN_LOAN_AMOUNT) return `Minimum loan amount is P${MIN_LOAN_AMOUNT}`;
+                    if (n > MAX_LOAN_AMOUNT)
+                      return `Maximum loan is P${MAX_LOAN_AMOUNT.toLocaleString()} (50% of pool)`;
                     return true;
                   },
                 })}
@@ -261,7 +242,7 @@ export default function LoanRequestPage() {
                   }`}
                 >
                   <option value="">Select purpose...</option>
-                  {PURPOSE_OPTIONS.map((p) => (
+                  {LOAN_PURPOSE_OPTIONS.map((p: string) => (
                     <option key={p}>{p}</option>
                   ))}
                 </select>
@@ -279,7 +260,7 @@ export default function LoanRequestPage() {
                   }`}
                 >
                   <option value="">Select period...</option>
-                  {REPAYMENT_OPTIONS.map((r) => (
+                  {REPAYMENT_PERIOD_OPTIONS.map((r: { label: string; value: string }) => (
                     <option key={r.value} value={r.value}>
                       {r.label}
                     </option>
