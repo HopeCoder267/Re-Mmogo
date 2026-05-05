@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff, UserPlus, ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
-
+ 
 interface RegisterFormData {
   fullName: string;
   email: string;
@@ -13,14 +13,14 @@ interface RegisterFormData {
   confirmPassword: string;
   agreeTerms: boolean;
 }
-
+ 
 function PasswordStrength({ password }: { password: string }) {
   const score =
     (password.length >= 8 ? 1 : 0) +
     (/[A-Z]/.test(password) ? 1 : 0) +
     (/[0-9]/.test(password) ? 1 : 0) +
     (/[^A-Za-z0-9]/.test(password) ? 1 : 0);
-
+ 
   const labels = ["", "Weak", "Fair", "Good", "Strong"];
   const colors = [
     "",
@@ -36,9 +36,9 @@ function PasswordStrength({ password }: { password: string }) {
     "text-lime-600",
     "text-emerald-600",
   ];
-
+ 
   if (!password) return null;
-
+ 
   return (
     <div className="mt-2">
       <div className="flex gap-1">
@@ -57,22 +57,22 @@ function PasswordStrength({ password }: { password: string }) {
     </div>
   );
 }
-
+ 
 export default function RegisterPage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-
+ 
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>();
-
+ 
   const password = watch("password", "");
-
+ 
   const onSubmit = async (data: RegisterFormData) => {
     // FEATURE PENDING: Replace with real API call
     console.log("Register payload:", data);
@@ -80,7 +80,7 @@ export default function RegisterPage() {
     toast.success("Account created! Awaiting admin approval.");
     setSubmitted(true);
   };
-
+ 
   if (submitted) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -90,7 +90,7 @@ export default function RegisterPage() {
             <h1 className="text-2xl font-bold tracking-wide">RE-MMOGO</h1>
           </div>
         </nav>
-
+ 
         {/* SECTION: SUCCESS STATE */}
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-10 max-w-md w-full text-center">
@@ -106,14 +106,14 @@ export default function RegisterPage() {
               onClick={() => navigate("/")}
               className="w-full bg-[#1e1b4b] hover:bg-[#2d2755] text-white py-3 rounded-lg font-semibold transition-colors"
             >
-              Back to Dashboard
+              Back to Sign In
             </button>
           </div>
         </div>
       </div>
     );
   }
-
+ 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* SECTION: NAVBAR */}
@@ -124,11 +124,11 @@ export default function RegisterPage() {
             onClick={() => navigate("/")}
             className="flex items-center gap-2 text-sm hover:bg-white/10 px-3 py-2 rounded-lg transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+            <ArrowLeft className="w-4 h-4" /> Back to Sign In
           </button>
         </div>
       </nav>
-
+ 
       {/* SECTION: FORM */}
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
@@ -146,7 +146,7 @@ export default function RegisterPage() {
               </p>
             </div>
           </div>
-
+ 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* SECTION: NAME + EMAIL */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -171,7 +171,7 @@ export default function RegisterPage() {
                   </p>
                 )}
               </div>
-
+ 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
                   Email Address
@@ -199,7 +199,7 @@ export default function RegisterPage() {
                 )}
               </div>
             </div>
-
+ 
             {/* SECTION: PHONE + ID */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -227,7 +227,7 @@ export default function RegisterPage() {
                   </p>
                 )}
               </div>
-
+ 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
                   ID / Omang Number
@@ -250,7 +250,7 @@ export default function RegisterPage() {
                 )}
               </div>
             </div>
-
+ 
             {/* SECTION: PASSWORD */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -290,7 +290,7 @@ export default function RegisterPage() {
                 )}
                 <PasswordStrength password={password} />
               </div>
-
+ 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
                   Confirm Password
@@ -329,7 +329,7 @@ export default function RegisterPage() {
                 )}
               </div>
             </div>
-
+ 
             {/* SECTION: TERMS */}
             <div>
               <label className="flex items-start gap-3 cursor-pointer">
@@ -354,7 +354,7 @@ export default function RegisterPage() {
                 </p>
               )}
             </div>
-
+ 
             {/* SECTION: SUBMIT */}
             <button
               type="submit"
@@ -363,14 +363,14 @@ export default function RegisterPage() {
             >
               {isSubmitting ? "Creating Account..." : "Create Account"}
             </button>
-
+ 
             <p className="text-center text-sm text-gray-500">
               Already have an account?{" "}
               <span
                 onClick={() => navigate("/")}
                 className="text-[#10b981] font-semibold cursor-pointer hover:underline"
               >
-                Back to Dashboard
+                Back to Sign In
               </span>
             </p>
           </form>

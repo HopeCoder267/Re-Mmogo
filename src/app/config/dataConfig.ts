@@ -1,5 +1,5 @@
 /* DATA CONFIG - Backend team replaces this with API calls */
-
+ 
 export const APP_CONFIG = {
   appName: "RE-MMOGO",
   theme: {
@@ -25,10 +25,10 @@ export const MEMBER_DATA = [
 ];
  
 export const ACTION_BUTTONS = [
-  { id: 1, label: "Record Contribution", icon: "plus", feature: "Record Contribution", route: undefined },
-  { id: 2, label: "Request Loan", icon: "handCoins", feature: "Request Loan", route: "/loan-request" },
-  { id: 3, label: "Approve (Signatory)", icon: "checkCircle", feature: "Approve Signatory", route: undefined },
-  { id: 4, label: "Enroll Member", icon: "users", feature: "Enroll Member", route: "/enroll" },
+  { id: 1, label: "Record Contribution", icon: "plus",        feature: "Record Contribution", route: undefined,       permissionKey: "record-contribution" },
+  { id: 2, label: "Request Loan",        icon: "handCoins",   feature: "Request Loan",        route: "/loan-request", permissionKey: "request-loan"        },
+  { id: 3, label: "Approve (Signatory)", icon: "checkCircle", feature: "Approve Signatory",   route: undefined,       permissionKey: "approve-signatory"   },
+  { id: 4, label: "Enroll Member",       icon: "users",       feature: "Enroll Member",       route: "/enroll",       permissionKey: "enroll-member"       },
 ];
  
 export const TABLE_COLUMNS = {

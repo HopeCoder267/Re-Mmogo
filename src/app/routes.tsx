@@ -3,22 +3,28 @@ import Dashboard from "./components/Dashboard";
 import RegisterPage from "./components/RegisterPage";
 import LoanRequestPage from "./components/LoanRequestPage";
 import MemberEnrollmentPage from "./components/MemberEnrollmentPage";
+import SignInPage from "./components/SignInPage";
+import { RequireAuth } from "./components/RequireAuth";
  
 export const router = createBrowserRouter([
   {
     path: "/",
-    Component: Dashboard,
+    Component: SignInPage,
+  },
+  {
+    path: "/dashboard",
+    element: <RequireAuth><Dashboard /></RequireAuth>,
   },
   {
     path: "/register",
-    Component: RegisterPage,
+    Component: RegisterPage,   // public — accessible before login
   },
   {
     path: "/loan-request",
-    Component: LoanRequestPage,
+    element: <RequireAuth><LoanRequestPage /></RequireAuth>,
   },
   {
     path: "/enroll",
-    Component: MemberEnrollmentPage,
+    element: <RequireAuth><MemberEnrollmentPage /></RequireAuth>,
   },
 ]);
