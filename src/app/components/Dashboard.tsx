@@ -57,7 +57,7 @@ export default function Dashboard() {
             )}
           </div>
           <div className="flex items-center gap-1 sm:gap-2">
-            {isSignatory && (
+            {isSignatory() && (
               <button
                 onClick={() => navigate("/signatory-approvals")}
                 className="flex items-center gap-2 text-xs sm:text-sm hover:bg-white/10 px-2 sm:px-3 py-2 rounded-lg transition-colors"
@@ -68,7 +68,7 @@ export default function Dashboard() {
                 <span className="hidden sm:inline">Approvals</span>
               </button>
             )}
-            {isTreasurer && (
+            {isTreasurer() && (
               <button
                 onClick={() => navigate("/record-contribution")}
                 className="flex items-center gap-2 text-xs sm:text-sm hover:bg-white/10 px-2 sm:px-3 py-2 rounded-lg transition-colors"
@@ -79,7 +79,7 @@ export default function Dashboard() {
                 <span className="hidden sm:inline">Record</span>
               </button>
             )}
-            {isMember && (
+            {isMember() && (
               <button
                 onClick={() => navigate("/loan-request")}
                 className="flex items-center gap-2 text-xs sm:text-sm hover:bg-white/10 px-2 sm:px-3 py-2 rounded-lg transition-colors"
