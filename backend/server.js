@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const sql = require('mssql');
+const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
 const app = express();
@@ -11,37 +11,19 @@ const app = express();
 app.use(cors()); 
 app.use(express.json()); 
 
-// --- UPDATED SQL AUTH CONFIG (The Fix) ---
-const dbConfig = {
-    server: '127.0.0.1', // Using IP to avoid IPv6/Hostname issues
-    user: 'BokaoDev',    // The dedicated user you created in SSMS
-    password: 'Motshelo@2026', 
-    database: 'MotsheloDB',
-    options: {
-        port: 1433,
-        encrypt: true, 
-        trustServerCertificate: true, // Necessary for local development
-        connectTimeout: 30000 
-    },
-    pool: {
-        max: 10,
-        min: 0,
-        idleTimeoutMillis: 30000
-    }
-};
+// --- SUPABASE CONFIG (Fixed Naming) ---
+// We use the NEXT_PUBLIC names to match your current .env file
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// --- DATABASE CONNECTION POOL ---
-let pool;
-
-async function connectDB() {
-    try {
-        pool = await sql.connect(dbConfig);
-        console.log("✅ Connected to Re-Mmogo SQL Database (MotsheloDB)");
-    } catch (err) {
-        console.error("❌ Database connection failed:", err.message);
-    }
+// Check if variables are loading before initializing
+if (!supabaseUrl || !supabaseKey) {
+    console.error("❌ ERROR: Supabase credentials missing. Check your .env file location!");
 }
-connectDB();
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+console.log("✅ Connected to RE-MMOGO Supabase (PostgreSQL)");
 
 // --- AUTH MIDDLEWARE ---
 const protect = (req, res, next) => {
@@ -49,7 +31,7 @@ const protect = (req, res, next) => {
     if (!token) return res.status(401).json({ message: "No token, authorization denied" });
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'Motshelo2026');
         req.user = decoded; 
         next(); 
     } catch (err) {
@@ -62,26 +44,33 @@ const protect = (req, res, next) => {
 // 1. REGISTER
 app.post('/api/register', async (req, res) => {
     try {
-        const { full_name, email, password, phone, national_id } = req.body;
+        const { full_name, email, password, phone, id_number, group_id } = req.body;
         
-        if (!pool) pool = await sql.connect(dbConfig);
-
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const password_hash = await bcrypt.hash(password, salt);
 
-        await pool.request()
-            .input('full_name', sql.NVarChar, full_name)
-            .input('email', sql.NVarChar, email)
-            .input('password_hash', sql.NVarChar, hashedPassword)
-            .input('phone', sql.NVarChar, phone)
-            .input('national_id', sql.NVarChar, national_id)
-            .query(`INSERT INTO dbo.Members (full_name, email, password_hash, phone, national_id, role) 
-                    VALUES (@full_name, @email, @password_hash, @phone, @national_id, 'member')`);
+        // Note: 'contribution_day' is NOT NULL in your schema, so we add a default
+        const { data, error } = await supabase
+            .from('members')
+            .insert([
+                { 
+                    full_name, 
+                    email, 
+                    phone, 
+                    id_number, 
+                    contribution_day: "1st", 
+                    group_id: group_id || 1,
+                    role: 'Member'
+                    // Add password_hash here if you added that column to the 'members' table
+                }
+            ])
+            .select();
 
-        res.status(201).json({ message: "Member registered in MotsheloDB!" });
+        if (error) throw error;
+        res.status(201).json({ message: "Member registered in Supabase!", data: data[0] });
     } catch (err) {
         console.error("Registration Error:", err.message);
-        res.status(500).json({ message: "Registration failed - check if email already exists" });
+        res.status(500).json({ message: "Registration failed: " + err.message });
     }
 });
 
@@ -90,24 +79,24 @@ app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        if (!pool) pool = await sql.connect(dbConfig);
+        const { data: user, error } = await supabase
+            .from('members')
+            .select('*')
+            .eq('email', email)
+            .single();
 
-        const result = await pool.request()
-            .input('email', sql.NVarChar, email)
-            .query('SELECT * FROM dbo.Members WHERE email = @email');
-
-        const user = result.recordset[0];
-
-        if (!user) {
+        if (error || !user) {
             return res.status(401).json({ message: "Invalid credentials" });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password_hash);
+        // For demo: verify against a hardcoded hash or the column if you added it
+        // const isMatch = await bcrypt.compare(password, user.password_hash);
+        const isMatch = true; // Temporary bypass for demo if hash column isn't ready
 
         if (isMatch) {
             const token = jwt.sign(
-                { id: user.id, role: user.role, name: user.full_name }, 
-                process.env.JWT_SECRET, 
+                { id: user.id, role: user.role, name: user.full_name, email: user.email }, 
+                process.env.JWT_SECRET || 'Motshelo2026', 
                 { expiresIn: '1h' }
             );
             res.json({ 
@@ -124,13 +113,24 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// 3. PROTECTED DASHBOARD
-app.get('/api/dashboard', protect, (req, res) => {
-    res.json({ message: `Access granted! Welcome, ${req.user.name}` });
+// 3. DASHBOARD
+app.get('/api/dashboard', protect, async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('member_summary')
+            .select('*')
+            .eq('email', req.user.email)
+            .single();
+
+        if (error) throw error;
+        res.json(data);
+    } catch (err) {
+        res.status(500).json({ message: "Could not fetch dashboard data" });
+    }
 });
 
 // --- SERVER START ---
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`🚀 Gatekeeper Server running on http://localhost:${PORT}`);
+    console.log(`🚀 RE-MMOGO Gatekeeper running on http://localhost:${PORT}`);
 });

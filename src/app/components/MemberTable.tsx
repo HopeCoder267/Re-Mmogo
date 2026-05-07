@@ -1,13 +1,6 @@
 import { Check, X } from "lucide-react";
 import { TABLE_COLUMNS } from "../config/dataConfig";
-
-interface Member {
-  id: number;
-  name: string;
-  monthlyPaid: boolean;
-  progressPercent: number;
-  signatoryStatus: string;
-}
+import { Member } from "../../types";
 
 interface MemberTableProps {
   members: Member[];
@@ -30,7 +23,7 @@ export function MemberTable({ members }: MemberTableProps) {
           <tbody className="divide-y divide-gray-100">
             {members.map((member) => (
               <tr key={member.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">{member.name}</td>
+                <td className="px-6 py-4 text-sm font-medium text-gray-900">{member.fullName}</td>
                 <td className="px-6 py-4">
                   {member.monthlyPaid ? (
                     <span className="inline-flex items-center gap-1 text-[#10b981] font-semibold">
